@@ -10,10 +10,17 @@ import java.util.Arrays;
 class FileTest {
 	File nodeFile = new File("file.txt");
 	File nodeDir = new File("dir1/dir2");
+	File printStream = new File("printStream.txt");
+	File printWriter = new File("printWriter.txt");
+	File personStream = new File("person.data");
+	String text = "HELLO";
 	@BeforeEach
 	void setUp() throws Exception {
 		nodeFile.delete();
 		nodeDir.delete();
+		printStream.delete();
+		printWriter.delete();
+		personStream.delete();
 	}
 
 	@Test
@@ -51,6 +58,42 @@ class FileTest {
 		os.write(buffer);
 		is.close();
 		os.close();
+	}
+	@Test
+	void testPrintStream() throws Exception {
+		PrintStream stream = new PrintStream(printStream);
+		stream.println(text);
+		BufferedReader reader = new BufferedReader(new FileReader(printStream));
+		assertEquals(text, reader.readLine());
+		stream.close();
+		reader.close();
+		
+		
+	}
+	@Test
+	void testPrintWriter() throws Exception {
+		PrintWriter stream = new PrintWriter(printWriter);
+		stream.println(text);
+		stream.flush();
+		BufferedReader reader = new BufferedReader(new FileReader(printWriter));
+		assertEquals(text, reader.readLine());
+		stream.close();
+		reader.close();
+		
+		
+	}
+	@Test
+	void objectOrientedStreamTest() throws Exception{
+		Person person = new Person(123, "Vasya", null);
+		person.setAnotherPerson(person);
+		ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(personStream));
+		output.writeObject(person);
+		output.close();
+		ObjectInputStream input = new ObjectInputStream(new FileInputStream(personStream));
+		Person anotherPerson = (Person) input.readObject();
+		assertEquals(person, anotherPerson);
+		input.close();
+		
 	}
 	
 	
